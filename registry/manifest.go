@@ -1,13 +1,16 @@
 package registry
 
 import (
+	_ "crypto/sha256"
+	_ "crypto/sha512"
+
 	"bytes"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/docker/distribution/digest"
 	manifestV1 "github.com/docker/distribution/manifest/schema1"
 	manifest "github.com/docker/distribution/manifest/schema2"
+	"github.com/opencontainers/go-digest"
 )
 
 func (registry *Registry) Manifest(repository, reference string) (*manifest.DeserializedManifest, error) {
@@ -54,7 +57,7 @@ func (registry *Registry) ManifestDigest(repository, reference string) (digest.D
 	if err != nil {
 		return "", err
 	}
-	return digest.ParseDigest(resp.Header.Get("Docker-Content-Digest"))
+	return digest.Parse(resp.Header.Get("Docker-Content-Digest"))
 }
 
 func (registry *Registry) DeleteManifest(repository string, digest digest.Digest) error {
