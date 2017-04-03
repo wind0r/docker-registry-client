@@ -1,14 +1,10 @@
 package registry
 
 import (
-	_ "crypto/sha256"
-	_ "crypto/sha512"
-
 	"bytes"
 	"io/ioutil"
 	"net/http"
 
-	manifestV1 "github.com/docker/distribution/manifest/schema1"
 	manifest "github.com/docker/distribution/manifest/schema2"
 	"github.com/opencontainers/go-digest"
 )
@@ -77,7 +73,7 @@ func (registry *Registry) DeleteManifest(repository string, digest digest.Digest
 	return err
 }
 
-func (registry *Registry) PutManifest(repository, reference string, signedManifest *manifestV1.SignedManifest) error {
+func (registry *Registry) PutManifest(repository, reference string, signedManifest *manifest.DeserializedManifest) error {
 	url := registry.url("/v2/%s/manifests/%s", repository, reference)
 	registry.Logf("registry.manifest.put url=%s repository=%s reference=%s", url, repository, reference)
 
@@ -92,7 +88,7 @@ func (registry *Registry) PutManifest(repository, reference string, signedManife
 		return err
 	}
 
-	req.Header.Set("Content-Type", manifestV1.MediaTypeManifest)
+	req.Header.Set("Content-Type", manifest.MediaTypeManifest)
 	resp, err := registry.Client.Do(req)
 	if resp != nil {
 		defer resp.Body.Close()
